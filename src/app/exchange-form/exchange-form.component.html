@@ -1,0 +1,61 @@
+<div class="container mt-1">
+  <div class="row py-3 px-4">
+    <div class="col-md-12">
+      <form [formGroup]="currencyForm">
+        <div class="form-body">
+          <div class="input-money-name">
+            <select
+              class="custom-select"
+              id="inputGroupSelect03"
+              formControlName="currencyOne"
+            >
+              <option value="" disabled selected>Select Currency</option>
+              <option *ngFor="let item of data" [value]="item.rate">
+                {{ item.txt }}
+              </option>
+            </select>
+            <select
+              class="custom-select"
+              id="inputGroupSelect04"
+              formControlName="currencyTwo"
+            >
+              <option value="" disabled selected>Select Currency</option>
+              <option *ngFor="let item of data" [value]="item.rate">
+                {{ item.txt }}
+              </option>
+            </select>
+          </div>
+          <h5 class="text-bold mt-4">Conversion</h5>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="input-group">
+                <span class="input-group-text">value 1</span>
+                <input
+                  type="number"
+                  name="firstValue"
+                  [(ngModel)]="firstValue"
+                  formControlName="amountOne"
+                  class="form-control"
+                  (keyup)="handleChangeFirstValue($event)"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group">
+                <span class="input-group-text">value 2</span>
+                <input
+                  type="number"
+                  name="secondValue"
+                  [(ngModel)]="secondValue"
+                  formControlName="amountTwo"
+                  class="form-control"
+                  (keyup)="handleChangeSecondValue($event)"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
