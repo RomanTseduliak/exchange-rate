@@ -1,6 +1,8 @@
+import { CurrencyService } from './../services/currency.service';
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
-import { AppService } from 'src/app.service';
+import { Currency } from '../models/currency.model';
+import { Subject, map, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-exchange-form',
@@ -8,11 +10,12 @@ import { AppService } from 'src/app.service';
   styleUrls: ['./exchange-form.component.scss'],
 })
 export class ExchangeFormComponent {
-  firstValue: any;
-  secondValue: any;
-  firstValueRate: any;
-  secondValueRate: any;
-  data: any;
+  currencies$ = this.currencyService.currencies$.pipe(
+    map((currencies: Currency[]) => currencies)
+  );
+  firstValueRate: number = 0;
+  secondValueRate: number = 0;
+  currencyArray: Currency[] = [];
   event: string = '';
 
   currencyForm = this.fb.group({
@@ -22,50 +25,56 @@ export class ExchangeFormComponent {
     amountTwo: [''],
   });
 
-  constructor(private appService: AppService, private fb: FormBuilder) {}
+  unsubscribe$ = new Subject<void>();
+
+  constructor(
+    private currencyService: CurrencyService,
+    private fb: FormBuilder
+  ) {}
 
   ngOnInit() {
-    this.appService.getData().subscribe(
-      (response) => {
-        this.data = response;
-      },
-      (error) => {
-        console.error('Error:', error);
-      }
-    );
-    this.callBoth();
+    this.subscribeToCurrenciesChange();
+  }
+  ngOnDestroy() {
+    this.unsubscribe$;
   }
 
-  callBoth() {
+  subscribeToCurrenciesChange() {
     this.recalculateFirstValue();
     this.recalculateSecondValue();
   }
 
   recalculateFirstValue() {
-    this.currencyOne.valueChanges.subscribe((value) => {
-      this.firstValue = value;
-      this.firstValueRate = value;
-    });
+    this.currencyOne.valueChanges
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((value) => {
+        this.amountOne.setValue(value);
+        this.firstValueRate = value;
+      });
   }
 
   recalculateSecondValue() {
-    this.currencyTwo.valueChanges.subscribe((value) => {
-      this.secondValue = value;
-      this.secondValueRate = value;
-    });
+    this.currencyTwo.valueChanges
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((value) => {
+        this.amountTwo.setValue(value);
+        this.secondValueRate = value;
+      });
   }
   handleChangeFirstValue(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
-    this.secondValue =
+    const secondValue =
       (Number(this.firstValueRate) * Number(value)) /
       Number(this.secondValueRate);
+    this.amountTwo.setValue(secondValue);
   }
 
   handleChangeSecondValue(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-    this.firstValue =
+    const value = (event?.target as HTMLInputElement).value;
+    const firstValue =
       (Number(this.secondValueRate) * Number(value)) /
       Number(this.firstValueRate);
+    this.amountOne.setValue(firstValue);
   }
 
   get currencyOne(): FormControl {
@@ -73,5 +82,11 @@ export class ExchangeFormComponent {
   }
   get currencyTwo(): FormControl {
     return this.currencyForm.get('currencyTwo') as FormControl;
+  }
+  get amountOne(): FormControl {
+    return this.currencyForm.get('amountOne') as FormControl;
+  }
+  get amountTwo(): FormControl {
+    return this.currencyForm.get('amountTwo') as FormControl;
   }
 }

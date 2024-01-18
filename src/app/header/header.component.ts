@@ -1,5 +1,13 @@
 import { Component } from '@angular/core';
-import { AppService } from 'src/app.service';
+import { CurrencyService } from '../services/currency.service';
+import { Currency } from '../models/currency.model';
+import { map } from 'rxjs';
+
+const getFilteredItems = (currencyArray: Currency[]) => {
+  return currencyArray.filter(
+    (currencyArray) => currencyArray.cc === 'USD' || currencyArray.cc === 'EUR'
+  );
+};
 
 @Component({
   selector: 'app-header',
@@ -7,23 +15,11 @@ import { AppService } from 'src/app.service';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent {
-  data: any;
-  result: any;
+  currencies$ = this.currencyService.currencies$.pipe(
+    map((currencies: Currency[]) => getFilteredItems(currencies))
+  );
 
-  constructor(private appService: AppService) {}
+  constructor(private currencyService: CurrencyService) {}
 
-  ngOnInit(): void {
-    this.appService.getData().subscribe(
-      (response) => {
-        this.data = response;
-        this.getFilteredItems(this.data);
-      },
-      (error) => {
-        console.error('Error:', error);
-      }
-    );
-  }
-  getFilteredItems(data: any[]) {
-    this.result = data.filter((data) => data.cc === 'USD' || data.cc === 'EUR');
-  }
+  ngOnInit(): void {}
 }

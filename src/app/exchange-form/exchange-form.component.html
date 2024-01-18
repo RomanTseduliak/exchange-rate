@@ -10,8 +10,11 @@
               formControlName="currencyOne"
             >
               <option value="" disabled selected>Select Currency</option>
-              <option *ngFor="let item of data" [value]="item.rate">
-                {{ item.txt }}
+              <option
+                *ngFor="let currency of currencies$ | async"
+                [value]="currency.rate"
+              >
+                {{ currency.txt }}
               </option>
             </select>
             <select
@@ -20,8 +23,11 @@
               formControlName="currencyTwo"
             >
               <option value="" disabled selected>Select Currency</option>
-              <option *ngFor="let item of data" [value]="item.rate">
-                {{ item.txt }}
+              <option
+                *ngFor="let currency of currencies$ | async"
+                [value]="currency.rate"
+              >
+                {{ currency.txt }}
               </option>
             </select>
           </div>
@@ -33,7 +39,6 @@
                 <input
                   type="number"
                   name="firstValue"
-                  [(ngModel)]="firstValue"
                   formControlName="amountOne"
                   class="form-control"
                   (keyup)="handleChangeFirstValue($event)"
@@ -46,7 +51,6 @@
                 <input
                   type="number"
                   name="secondValue"
-                  [(ngModel)]="secondValue"
                   formControlName="amountTwo"
                   class="form-control"
                   (keyup)="handleChangeSecondValue($event)"

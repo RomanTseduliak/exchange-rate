@@ -1,3 +1,3 @@
-<div class="header-wrapper" *ngFor="let item of result">
-  {{ item.txt }} - {{ item.rate }}
+<div class="header-wrapper" *ngFor="let currency of currencies$ | async">
+  {{ currency.txt }} - {{ currency.rate }}
 </div>
